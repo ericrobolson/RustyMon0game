@@ -1,0 +1,19 @@
+[package]
+name = "game"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+engine = {path="../engine"}
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = "0.2"
+
+# Hacky work around on M1 mac, https://github.com/rustwasm/wasm-pack/pull/1088 should fix it
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
