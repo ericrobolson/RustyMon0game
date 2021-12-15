@@ -2,6 +2,8 @@
 #![macro_use]
 extern crate alloc;
 
+pub mod mem;
+
 pub mod engine;
 pub mod events;
 pub mod file_system;
