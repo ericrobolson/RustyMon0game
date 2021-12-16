@@ -1,0 +1,14 @@
+[package]
+name = "m_gpu"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["gfx_wgpu"]
+gfx_wgpu = ["wgpu"]
+
+[dependencies]
+wgpu = {version="0.11", optional=true}
+m_window = {path="../m_window"}

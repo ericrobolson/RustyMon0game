@@ -11,22 +11,46 @@ pub struct Engine {
     pub input: Input,
     pub services: Services,
     pub file_system: FileSystem,
-    pub window: Window,
-    pub(crate) should_exit: bool,
-
+    pub window: Option<Window>,
+    should_exit: bool,
     last_update: Instant,
 }
 
 impl Engine {
     /// Creates a new instance of the engine.
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(use_window: bool) -> Self {
         Self {
             input: Input::new(),
             services: Services::new(),
             file_system: FileSystem::new(),
-            window: Window::new(0, 0),
+            window: if use_window {
+                Some(Window::new(0, 0))
+            } else {
+                None
+            },
             should_exit: false,
             last_update: Instant::now(),
+        }
+    }
+
+    /// Begins execution of the engine
+    pub(crate) fn begin_execution<TGame>()
+    where
+        TGame: Game + 'static,
+    {
+        let mut game = TGame::new();
+        let mut engine = engine::Engine::new(true);
+
+        let renderer = match &mut engine.window {
+            Some(window) => Some(renderer::Renderer::new(window)),
+            None => None,
+        };
+
+        game.initialize(&mut engine);
+
+        match renderer {
+            Some(renderer) => window::Window::begin_execution(engine, game, renderer),
+            None => Self::headless_game_loop(engine, game),
         }
     }
 
@@ -36,7 +60,11 @@ impl Engine {
             EngineEvent::WindowResize {
                 width_px,
                 height_px,
-            } => self.window.set_size(*width_px, *height_px),
+            } => {
+                if let Some(window) = &mut self.window {
+                    window.set_size(*width_px, *height_px)
+                }
+            }
             EngineEvent::Shutdown => self.should_exit = true,
         }
 
@@ -52,8 +80,23 @@ impl Engine {
         game.update(delta_t, engine);
     }
 
+    /// Returns whether the engine should exit or not
+    pub(crate) fn should_exit(&self) -> bool {
+        self.should_exit
+    }
+
     /// Signals that the engine should quit.
     pub fn quit(&mut self) {
         self.should_exit = true;
+    }
+
+    /// Runs the game in a headless game loop
+    pub(crate) fn headless_game_loop<TGame>(mut engine: crate::engine::Engine, mut game: TGame)
+    where
+        TGame: Game + 'static,
+    {
+        while !engine.should_exit {
+            Self::update(&mut engine, &mut game);
+        }
     }
 }

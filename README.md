@@ -10,9 +10,12 @@ A simple Monogame inspired engine that targets Windows, Linux, Mac and the Web.
 - [x] Add in React client and Yarn 
 - [x] Get web target served
 - [x] Serve and execute WASM https://rustwasm.github.io/wasm-bindgen/examples/hello-world.html https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_wasm
+- [x] Create windowing
+- [ ] Make simple renderer
+- [ ] Add time module and get working on native and web
+- [ ] Split out web functionality, may punt for now
 - [ ] Clean up project so that the engine is split out from everything else?
 - [ ] Make engine `no-std`? Gotta figure out the issues with Instant and the like.
-- [ ] Add time module and get working on native and web
 - [ ] Add in drawing of triangles for mac, linux, web, windows
 - [ ] Add drawing of images
 - [ ] Get file system running for mac, linux, web, windows

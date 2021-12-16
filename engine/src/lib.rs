@@ -1,19 +1,15 @@
-#![cfg_attr(not(test), no_std)]
-#![macro_use]
-extern crate alloc;
-
-pub mod mem;
-
 pub mod engine;
 pub mod events;
 pub mod file_system;
 pub mod input;
+pub mod mem;
 pub mod renderer;
 pub mod services;
 pub mod time;
 pub mod util;
 pub mod window;
 
+use engine::Engine;
 pub(crate) use events::*;
 
 /// A set of traits the game must implement for usage by the engine.
@@ -50,13 +46,7 @@ pub fn init<TGame>()
 where
     TGame: Game + 'static,
 {
-    // Set up everything
-    let mut game = TGame::new();
-    let mut engine = engine::Engine::new();
-    let renderer = renderer::Renderer::new();
-
-    // Initialize game
-    game.initialize(&mut engine);
+    Engine::begin_execution::<TGame>()
 }
 
 #[cfg(target_arch = "wasm32")]

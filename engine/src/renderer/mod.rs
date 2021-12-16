@@ -1,20 +1,26 @@
-use crate::*;
+use crate::{window::Window, *};
+use m_gpu::{init_gpu, Gpu};
 use mem::*;
 use time::Instant;
 
 /// A basic renderer abstraction.
 pub struct Renderer {
+    gfx_renderer: Option<Box<dyn Gpu>>,
     last_execution: Instant,
     queued_commands: StaticBuffer<RenderCommand>,
-    gfx_renderer: Option<Box<dyn GfxRenderer>>,
 }
 impl Renderer {
     /// Creates a new renderer
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(window: &mut Window) -> Self {
         let max_commands = 1000;
 
+        let gfx_renderer = match window.raw_handle() {
+            Some(handle) => Some(init_gpu(handle)),
+            None => None,
+        };
+
         Self {
-            gfx_renderer: None,
+            gfx_renderer,
             last_execution: Instant::now(),
             queued_commands: StaticBuffer::new(max_commands),
         }
@@ -50,7 +56,7 @@ impl Renderer {
                 match command {
                     RenderCommand::Image {
                         image_id,
-                        screen_position,
+                        screen_position_px,
                         scale,
                         sub_img,
                     } => todo!(),
@@ -62,32 +68,6 @@ impl Renderer {
             gfx.end_render_pass();
         }
     }
-}
-
-/// The actual hardware renderer.
-/// This is extremely simple to ensure ease of porting.
-pub trait GfxRenderer {
-    /// Starts a new render pass.
-    fn begin_render_pass(&mut self);
-    /// Ends the render pass
-    fn end_render_pass(&mut self);
-    /// Presents the image
-    fn render(&mut self);
-
-    /// Drops the given image from the GPU.
-    fn drop_image(&mut self, image_id: ());
-    /// Pushes the given image to the GPU.
-    fn load_image(&mut self, image_id: (), image: ());
-
-    /// Queues the given image to be rendered.
-    fn queue_image(
-        &mut self,
-        image_id: (),
-        screen_position: (RangeN1to1, RangeN1to1, RangeN1to1),
-        scale: (f32, f32),
-        sub_img: (Range0to1, Range0to1),
-        color: Color,
-    );
 }
 
 /// RGBA color

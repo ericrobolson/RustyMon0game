@@ -13,6 +13,10 @@ default = []
 
 [dependencies]
 bytemuck = "1.7"
+m_gpu = {path="./m_gpu"}
+m_math = {path="./m_math"}
+m_window = {path="./m_window"}
+
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 winit = {version="0.26"}
